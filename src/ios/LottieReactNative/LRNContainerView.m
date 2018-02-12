@@ -65,7 +65,15 @@
   NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData
                                                        options:kNilOptions
                                                          error:nil];
-  [self replaceAnimationView:[LOTAnimationView animationFromJSON:json]];
+ 
+  if ([json objectForKey:@"uri"] != nil){
+      NSString* uri = json[@"uri"];
+      NSURL * url = [NSURL fileURLWithPath:uri];
+      LOTAnimationView * view = [[LOTAnimationView alloc] initWithContentsOfURL:url];
+      [self replaceAnimationView:view];
+  } else {
+      [self replaceAnimationView:[LOTAnimationView animationFromJSON:json]];
+  }
 }
 
 - (void)setSourceName:(NSString *)name {
@@ -92,6 +100,43 @@
     [_animationView pause];
   }
 }
+
+
+- (void)replaceBodyLayers:(NSString* )bodyImgURL
+     replacementLayersURL:(NSString* )layerURL
+{
+    NSArray * layers = @[
+                         @"CONTOUR_LAYER_01",
+                         @"CONTOUR_LAYER_02",
+                         @"CONTOUR_LAYER_03",
+                         @"CONTOUR_LAYER_04",
+                         @"CONTOUR_LAYER_05",
+                         @"CONTOUR_LAYER_06"
+                         ];
+    
+    UIImage* maskedImage = [UIImage imageWithContentsOfFile:bodyImgURL];
+    
+    for (NSString *layerName in layers ){
+        [self setImageToLayer:maskedImage withName:layerName onView:_animationView];
+    }
+}
+
+- (void)setImageToLayer:(UIImage*)image withName:(NSString *) layerName onView:(LOTAnimationView*)lottieBg
+{
+    UIImageView* imageView = [[UIImageView alloc] initWithImage:image];
+    int width = 1500;//self.maskedImage.size.width;
+    int height = 1500;//self.maskedImage.size.height;
+    CGRect imageRect = CGRectMake( -width / 2, -height / 2,  width, height);
+    [lottieBg convertRect:imageRect toLayerNamed:nil];
+    imageView.frame = imageRect;
+    imageView.layer.masksToBounds = true;
+    [lottieBg addSubview:imageView toLayerNamed:layerName applyTransform:YES];
+    
+    NSString* keyText = [NSString stringWithFormat:@"%@.Group 1.CONTOUR_SHAPE.Fill 1.Color", layerName];
+    UIColor* color =[[UIColor alloc] initWithRed:0 green:0 blue:0 alpha:0];
+    [lottieBg setValue:color forKeypath:keyText atFrame:@0];
+}
+
 
 # pragma mark Private
 

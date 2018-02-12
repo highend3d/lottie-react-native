@@ -21,6 +21,7 @@ const LottieViewManager = SafeModule.module({
   mock: {
     play: () => {},
     reset: () => {},
+    replaceBodyLayers  : () => {}
   },
 });
 
@@ -95,6 +96,10 @@ class LottieView extends React.Component {
     this.runCommand('reset');
   }
 
+  replaceBodyLayers(bodyImgURL, layersURL) {
+    this.runCommand('replaceBodyLayers', [bodyImgURL, layersURL]);
+  }
+
   runCommand(name, args = []) {
     return Platform.select({
       android: () =>
@@ -136,6 +141,16 @@ LottieView.propTypes = propTypes;
 LottieView.defaultProps = defaultProps;
 
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView);
+
+
+AnimatedLottieView.prototype.replaceBodyLayers = function replaceBodyLayers(bodyImgURL, layersURL) {
+  if (this.getNode()) {
+    return this.getNode().replaceBodyLayers(bodyImgURL, layersURL);
+  }
+  console.warn('Trying to animate a view on an unmounted component');
+  return null;
+};
+
 
 AnimatedLottieView.prototype.play = function play(startFrame = -1, endFrame = -1) {
   if (this.getNode()) {

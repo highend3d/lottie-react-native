@@ -31,4 +31,7 @@
               toFrame:(NSNumber *)endFrame;
 - (void)reset;
 
+- (void)replaceBodyLayers:(NSString* )bodyImgURL
+    replacementLayersURL:(NSString* )layerURL ;
+
 @end
