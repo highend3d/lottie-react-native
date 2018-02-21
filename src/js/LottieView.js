@@ -21,7 +21,9 @@ const LottieViewManager = SafeModule.module({
   mock: {
     play: () => {},
     reset: () => {},
-    replaceBodyLayers  : () => {}
+    replaceBodyLayers  : () => {},
+    startRecording  : () => {},
+    stopRecording  : () => {},
   },
 });
 
@@ -100,6 +102,15 @@ class LottieView extends React.Component {
     this.runCommand('replaceBodyLayers', [bodyImgURL, layersURL]);
   }
 
+  startRecording() {
+    this.runCommand('start');
+  }
+
+
+  stopRecording() {
+    this.runCommand('stop');
+  }
+
   runCommand(name, args = []) {
     return Platform.select({
       android: () =>
@@ -141,6 +152,22 @@ LottieView.propTypes = propTypes;
 LottieView.defaultProps = defaultProps;
 
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView);
+
+AnimatedLottieView.prototype.startRecording = function startRecording() {
+  if (this.getNode()) {
+    return this.getNode().startRecording();
+  }
+  console.warn('Trying to animate a view on an unmounted component');
+  return null;
+};
+
+AnimatedLottieView.prototype.stopRecording = function stopRecording() {
+  if (this.getNode()) {
+    return this.getNode().stopRecording();
+  }
+  console.warn('Trying to animate a view on an unmounted component');
+  return null;
+};
 
 
 AnimatedLottieView.prototype.replaceBodyLayers = function replaceBodyLayers(bodyImgURL, layersURL) {

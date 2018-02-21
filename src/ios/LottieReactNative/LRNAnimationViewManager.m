@@ -34,9 +34,12 @@
 
 RCT_EXPORT_MODULE(LottieAnimationView)
 
+ViewRecorder * recorder;
+
 - (UIView *)view
 {
-  return [LRNContainerView new];
+    recorder = [[ViewRecorder alloc] init];
+    return [LRNContainerView new];
 }
 
 + (BOOL)requiresMainQueueSetup
@@ -103,6 +106,29 @@ RCT_EXPORT_METHOD(replaceBodyLayers:(nonnull NSNumber *)reactTag
             [lottieView replaceBodyLayers:bodyImgURL replacementLayersURL:layerURL];
         }
     }];
+}
+
+RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag)
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+        id view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[LRNContainerView class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting LottieContainerView, got: %@", view);
+        } else {
+            LRNContainerView *lottieView = (LRNContainerView *)view;
+            [recorder startWithView:lottieView withCallback:^(NSString* path) {
+                if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(path)) {
+                    UISaveVideoAtPathToSavedPhotosAlbum(path, nil, nil, nil);
+                }
+            }];
+            
+            [lottieView play];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(stop:(nonnull NSNumber *)reactTag){
+    [recorder stop];
 }
 
 @end
