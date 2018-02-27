@@ -30,6 +30,8 @@
 
 #import <Lottie/Lottie.h>
 
+#import "LottieReactNative-Swift.h"
+
 @implementation LRNAnimationViewManager
 
 RCT_EXPORT_MODULE(LottieAnimationView)
