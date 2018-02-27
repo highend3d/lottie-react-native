@@ -101,22 +101,12 @@
   }
 }
 
-
 - (void)replaceBodyLayers:(NSString* )bodyImgURL
-     replacementLayersURL:(NSString* )layerURL
+     replacementLayersURL:(NSArray* )bodyLayers
 {
-    NSArray * layers = @[
-                         @"CONTOUR_LAYER_01",
-                         @"CONTOUR_LAYER_02",
-                         @"CONTOUR_LAYER_03",
-                         @"CONTOUR_LAYER_04",
-                         @"CONTOUR_LAYER_05",
-                         @"CONTOUR_LAYER_06"
-                         ];
-    
     UIImage* maskedImage = [UIImage imageWithContentsOfFile:bodyImgURL];
     
-    for (NSString *layerName in layers ){
+    for (NSString *layerName in bodyLayers ){
         [self setImageToLayer:maskedImage withName:layerName onView:_animationView];
     }
 }

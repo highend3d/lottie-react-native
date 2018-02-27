@@ -97,7 +97,7 @@ RCT_EXPORT_METHOD(reset:(nonnull NSNumber *)reactTag)
 
 RCT_EXPORT_METHOD(replaceBodyLayers:(nonnull NSNumber *)reactTag
                   bodyImgURL:(nonnull NSString *)bodyImgURL
-                  layersURL:(nonnull NSString *)layerURL)
+                  layersURL:(nonnull NSArray *)layerURL)
 {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
         id view = viewRegistry[reactTag];
