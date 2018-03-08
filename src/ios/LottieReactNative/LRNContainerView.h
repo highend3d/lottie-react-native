@@ -34,4 +34,8 @@
 - (void)replaceBodyLayers:(NSString* )bodyImgURL
     replacementLayersURL:(NSString* )layerURL ;
 
+- (void)replaceColorR:(nonnull  NSNumber*)r
+                    g:(nonnull  NSNumber*)g
+                    b:(nonnull  NSNumber*)b;
+
 @end

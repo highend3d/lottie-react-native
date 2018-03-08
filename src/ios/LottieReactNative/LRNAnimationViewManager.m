@@ -95,6 +95,23 @@ RCT_EXPORT_METHOD(reset:(nonnull NSNumber *)reactTag)
   }];
 }
 
+RCT_EXPORT_METHOD(replaceColor:(nonnull NSNumber *)reactTag
+                  r:(nonnull  NSNumber*)r
+                  g:(nonnull  NSNumber*)g
+                  b:(nonnull  NSNumber*)b
+                  )
+{
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+        id view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[LRNContainerView class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting LottieContainerView, got: %@", view);
+        } else {
+            LRNContainerView *lottieView = (LRNContainerView *)view;
+            [lottieView replaceColorR:r g:g b:b];
+        }
+    }];
+}
+
 RCT_EXPORT_METHOD(replaceBodyLayers:(nonnull NSNumber *)reactTag
                   bodyImgURL:(nonnull NSString *)bodyImgURL
                   layersURL:(nonnull NSArray *)layerURL)

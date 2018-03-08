@@ -101,6 +101,18 @@
   }
 }
 
+- (void)replaceColorR:(nonnull  NSNumber*)r
+                    g:(nonnull  NSNumber*)g
+                    b:(nonnull  NSNumber*)b
+{
+    LOTKeypath *keypath = [LOTKeypath keypathWithKeys:@"**", @"Color", nil];
+    
+    UIColor* color =  [[UIColor alloc] initWithRed:r.floatValue green:g.floatValue blue:b.floatValue alpha:1.0];
+    LOTColorValueCallback *colorCallback = [LOTColorValueCallback withCGColor:color.CGColor];
+    
+    [_animationView setValueDelegate:colorCallback forKeypath:keypath];
+}
+
 - (void)replaceBodyLayers:(NSString* )bodyImgURL
      replacementLayersURL:(NSArray* )bodyLayers
 {
