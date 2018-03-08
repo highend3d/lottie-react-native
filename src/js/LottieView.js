@@ -22,6 +22,7 @@ const LottieViewManager = SafeModule.module({
     play: () => {},
     reset: () => {},
     replaceBodyLayers  : () => {},
+    replaceColor : () => {},
     startRecording  : () => {},
     stopRecording  : () => {},
   },
@@ -102,6 +103,11 @@ class LottieView extends React.Component {
     this.runCommand('replaceBodyLayers', [bodyImgURL, layersURL]);
   }
 
+  replaceColor(r, g, b) {
+    this.runCommand('replaceColor', [r, g, b]);
+  }
+
+
   startRecording() {
     this.runCommand('start');
   }
@@ -173,6 +179,15 @@ AnimatedLottieView.prototype.stopRecording = function stopRecording() {
 AnimatedLottieView.prototype.replaceBodyLayers = function replaceBodyLayers(bodyImgURL, layersURL) {
   if (this.getNode()) {
     return this.getNode().replaceBodyLayers(bodyImgURL, layersURL);
+  }
+  console.warn('Trying to animate a view on an unmounted component');
+  return null;
+};
+
+
+AnimatedLottieView.prototype.replaceColor = function replaceColor(r, g, b) {
+  if (this.getNode()) {
+    return this.getNode().replaceColor(r, g, b);
   }
   console.warn('Trying to animate a view on an unmounted component');
   return null;
