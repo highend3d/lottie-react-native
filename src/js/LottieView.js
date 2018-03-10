@@ -108,8 +108,8 @@ class LottieView extends React.Component {
   }
 
 
-  startRecording() {
-    this.runCommand('start');
+  startRecording(bgData, fgData) {
+    this.runCommand('start', [bgData, fgData]);
   }
 
 
@@ -159,9 +159,9 @@ LottieView.defaultProps = defaultProps;
 
 const AnimatedLottieView = Animated.createAnimatedComponent(LottieView);
 
-AnimatedLottieView.prototype.startRecording = function startRecording() {
+AnimatedLottieView.prototype.startRecording = function startRecording(bgData, fgData) {
   if (this.getNode()) {
-    return this.getNode().startRecording();
+    return this.getNode().startRecording(bgData, fgData);
   }
   console.warn('Trying to animate a view on an unmounted component');
   return null;

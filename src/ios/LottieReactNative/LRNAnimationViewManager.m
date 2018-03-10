@@ -127,21 +127,74 @@ RCT_EXPORT_METHOD(replaceBodyLayers:(nonnull NSNumber *)reactTag
     }];
 }
 
-RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag)
+RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag
+                  bgData:(nonnull NSDictionary *)bgData
+                  fgData:(nonnull NSDictionary *)fgData
+                  )
 {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
+    
         id view = viewRegistry[reactTag];
         if (![view isKindOfClass:[LRNContainerView class]]) {
             RCTLogError(@"Invalid view returned from registry, expecting LottieContainerView, got: %@", view);
         } else {
+            
             LRNContainerView *lottieView = (LRNContainerView *)view;
+
+            Boolean hasBG = false;
+            UIImageView * bgImageView = nil;
+            if ([bgData objectForKey:@"type"]){
+                
+                NSString* bgType = bgData[@"type"];
+                NSString* bgPath = bgData[@"path"];
+                UIImage * bgImage = [UIImage imageWithContentsOfFile:bgPath];
+                bgImageView =  [[UIImageView alloc] initWithImage:bgImage];
+                //bgImageView.image = [bgImageView.image.renderingMode ] //theImageView.image?.withRenderingMode(.AlwaysTemplate)
+
+                if ([bgType isEqualToString:@"color"]){
+                    NSArray * colorArray = bgData[@"solidColor"];
+                    NSNumber * r = colorArray[0] ;
+                    NSNumber * g = colorArray[1] ;
+                    NSNumber * b = colorArray[2] ;
+                    UIColor* color = [UIColor colorWithRed:[r floatValue] green:[g floatValue] blue:[b floatValue] alpha:1.0];
+                    //bgImageView.tintColor = color;
+                    [lottieView setBackgroundColor:color];
+                } else {
+                    hasBG = true;
+                    [lottieView addSubview:bgImageView];
+                    [lottieView sendSubviewToBack:bgImageView];
+                }
+                bgImageView.frame = lottieView.frame;
+            }
+            
+            Boolean hasFG = false;
+            UIImageView * fgImageView = nil;
+            if ([fgData objectForKey:@"path"]){
+                hasFG = true;
+                NSString* fgPath = fgData[@"path"];
+                UIImage * fgImage = [UIImage imageWithContentsOfFile:fgPath];
+                fgImageView =  [[UIImageView alloc] initWithImage:fgImage];
+                [lottieView addSubview:fgImageView];
+                fgImageView.frame = lottieView.frame;
+            }
+            
+            [lottieView play];
             [recorder startWithView:lottieView withCallback:^(NSString* path) {
                 if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(path)) {
                     UISaveVideoAtPathToSavedPhotosAlbum(path, nil, nil, nil);
                 }
+                
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    if (hasFG){
+                        [fgImageView removeFromSuperview];
+                    }
+                    
+                    if (hasBG){
+                        [bgImageView removeFromSuperview];
+                    }
+                    
+                });
             }];
-            
-            [lottieView play];
         }
     }];
 }
