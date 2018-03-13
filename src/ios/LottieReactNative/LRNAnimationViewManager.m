@@ -133,31 +133,29 @@ RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag
                   )
 {
     [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
-    
+        
         id view = viewRegistry[reactTag];
         if (![view isKindOfClass:[LRNContainerView class]]) {
             RCTLogError(@"Invalid view returned from registry, expecting LottieContainerView, got: %@", view);
         } else {
             
             LRNContainerView *lottieView = (LRNContainerView *)view;
-
+            
             Boolean hasBG = false;
             UIImageView * bgImageView = nil;
-            if ([bgData objectForKey:@"type"]){
-                
-                NSString* bgType = bgData[@"type"];
+            if ([bgData objectForKey:@"path"]){
                 NSString* bgPath = bgData[@"path"];
                 UIImage * bgImage = [UIImage imageWithContentsOfFile:bgPath];
                 bgImageView =  [[UIImageView alloc] initWithImage:bgImage];
-                //bgImageView.image = [bgImageView.image.renderingMode ] //theImageView.image?.withRenderingMode(.AlwaysTemplate)
-
-                if ([bgType isEqualToString:@"color"]){
-                    NSArray * colorArray = bgData[@"solidColor"];
+                
+                
+                if ([bgData objectForKey:@"tintColor"]){
+                    NSArray * colorArray = bgData[@"tintColor"];
                     NSNumber * r = colorArray[0] ;
                     NSNumber * g = colorArray[1] ;
                     NSNumber * b = colorArray[2] ;
+                    //NSNumber * a = colorArray[3] ;
                     UIColor* color = [UIColor colorWithRed:[r floatValue] green:[g floatValue] blue:[b floatValue] alpha:1.0];
-                    //bgImageView.tintColor = color;
                     [lottieView setBackgroundColor:color];
                 } else {
                     hasBG = true;
@@ -174,6 +172,17 @@ RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag
                 NSString* fgPath = fgData[@"path"];
                 UIImage * fgImage = [UIImage imageWithContentsOfFile:fgPath];
                 fgImageView =  [[UIImageView alloc] initWithImage:fgImage];
+                
+                
+                if ([fgData objectForKey:@"tintColor"]){
+                    NSArray * colorArray = fgData[@"tintColor"];
+                    NSNumber * r = colorArray[0] ;
+                    NSNumber * g = colorArray[1] ;
+                    NSNumber * b = colorArray[2] ;
+                    UIColor* color = [UIColor colorWithRed:[r floatValue] green:[g floatValue] blue:[b floatValue] alpha:1.0];
+                    fgImageView.tintColor = color;
+                }
+                
                 [lottieView addSubview:fgImageView];
                 fgImageView.frame = lottieView.frame;
             }
