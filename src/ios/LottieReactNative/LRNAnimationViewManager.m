@@ -171,10 +171,12 @@ RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag
                 hasFG = true;
                 NSString* fgPath = fgData[@"path"];
                 UIImage * fgImage = [UIImage imageWithContentsOfFile:fgPath];
+                
                 fgImageView =  [[UIImageView alloc] initWithImage:fgImage];
                 
-                
                 if ([fgData objectForKey:@"tintColor"]){
+                    fgImage = [fgImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                    fgImageView =  [[UIImageView alloc] initWithImage:fgImage];
                     NSArray * colorArray = fgData[@"tintColor"];
                     NSNumber * r = colorArray[0] ;
                     NSNumber * g = colorArray[1] ;
