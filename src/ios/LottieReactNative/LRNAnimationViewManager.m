@@ -142,36 +142,59 @@ RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag
             LRNContainerView *lottieView = (LRNContainerView *)view;
             
             Boolean hasBG = false;
+            Boolean hasOverlay = false;
             UIImageView * bgImageView = nil;
+            UIImageView * bgImageViewOverlay = nil;
+            
             if ([bgData objectForKey:@"path"]){
                 NSString* bgPath = bgData[@"path"];
+                
+                if ([bgData objectForKey:@"overlayColor"]){
+                    hasOverlay = true;
+                    UIImage * bgImageForOverlay = [UIImage imageWithContentsOfFile:bgPath];
+                    bgImageForOverlay = [bgImageForOverlay imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                    bgImageViewOverlay =  [[UIImageView alloc] initWithImage:bgImageForOverlay];
+                    NSArray * colorArray = bgData[@"overlayColor"];
+                    float  r = [colorArray[0] floatValue] / 255.0;
+                    float  g = [colorArray[1] floatValue] / 255.0;
+                    float  b = [colorArray[2] floatValue] / 255.0;
+                    float  a = [colorArray[3] floatValue];
+                    UIColor* color = [UIColor colorWithRed:r green:g blue:b alpha:a];
+                    bgImageViewOverlay.tintColor = color;
+                    [lottieView addSubview:bgImageViewOverlay];
+                    [lottieView sendSubviewToBack:bgImageViewOverlay];
+                    bgImageViewOverlay.frame = lottieView.frame;
+                }
+                
                 UIImage * bgImage = [UIImage imageWithContentsOfFile:bgPath];
                 bgImageView =  [[UIImageView alloc] initWithImage:bgImage];
-                
-                
+                hasBG = true;
                 if ([bgData objectForKey:@"tintColor"]){
+                    bgImage = [bgImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                    bgImageView =  [[UIImageView alloc] initWithImage:bgImage];
                     NSArray * colorArray = bgData[@"tintColor"];
-                    NSNumber * r = colorArray[0] ;
-                    NSNumber * g = colorArray[1] ;
-                    NSNumber * b = colorArray[2] ;
-                    //NSNumber * a = colorArray[3] ;
-                    UIColor* color = [UIColor colorWithRed:[r floatValue] green:[g floatValue] blue:[b floatValue] alpha:1.0];
-                    [lottieView setBackgroundColor:color];
-                } else {
-                    hasBG = true;
-                    [lottieView addSubview:bgImageView];
-                    [lottieView sendSubviewToBack:bgImageView];
+                    float  r = [colorArray[0] floatValue] / 255.0;
+                    float  g = [colorArray[1] floatValue] / 255.0;
+                    float  b = [colorArray[2] floatValue] / 255.0;
+                    UIColor* color = [UIColor colorWithRed:r green:g blue:b alpha:1.0];
+                    bgImageView.tintColor = color;
                 }
+                [lottieView addSubview:bgImageView];
+                [lottieView sendSubviewToBack:bgImageView];
                 bgImageView.frame = lottieView.frame;
+                
             }
             
             Boolean hasFG = false;
+            Boolean hasStroke = false;
+            
             UIImageView * fgImageView = nil;
+            UIImageView * strokeImageView = nil;
+            
             if ([fgData objectForKey:@"path"]){
                 hasFG = true;
                 NSString* fgPath = fgData[@"path"];
                 UIImage * fgImage = [UIImage imageWithContentsOfFile:fgPath];
-                
                 fgImageView =  [[UIImageView alloc] initWithImage:fgImage];
                 
                 if ([fgData objectForKey:@"tintColor"]){
@@ -184,9 +207,18 @@ RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag
                     UIColor* color = [UIColor colorWithRed:[r floatValue] green:[g floatValue] blue:[b floatValue] alpha:1.0];
                     fgImageView.tintColor = color;
                 }
-                
                 [lottieView addSubview:fgImageView];
                 fgImageView.frame = lottieView.frame;
+                
+                
+                if ([fgData objectForKey:@"strokeImagePath"]){
+                    hasStroke = true;
+                    NSString* strokePath = fgData[@"strokeImagePath"];
+                    UIImage * strokeImage = [UIImage imageWithContentsOfFile:strokePath];
+                    strokeImageView =  [[UIImageView alloc] initWithImage:strokeImage];
+                    [lottieView addSubview:strokeImageView];
+                    strokeImageView.frame = lottieView.frame;
+                }
             }
             
             [lottieView play];
@@ -204,6 +236,13 @@ RCT_EXPORT_METHOD(start:(nonnull NSNumber *)reactTag
                         [bgImageView removeFromSuperview];
                     }
                     
+                    if (hasOverlay){
+                        [bgImageViewOverlay removeFromSuperview];
+                    }
+                    
+                    if (hasStroke) {
+                        [strokeImageView removeFromSuperview];
+                    }
                 });
             }];
         }
